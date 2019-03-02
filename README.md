@@ -21,7 +21,7 @@ bash download.sh
 
 ## Preprocessing
 Preprocessing the data set. This takes about 10 minutes.
-`PATH_TO_SQAUD_TRAIN` should be the path to the `train-v1.1.json` file and `PATH_TO_SQAUD_DEV` should be the path to the `dev-v1.1.json`. This will generate the preprocessed data file at `data/squad/data-fusion.pth`.
+`PATH_TO_SQAUD_TRAIN` should be the path to `train-v1.1.json` and `PATH_TO_SQAUD_DEV` should be the path to `dev-v1.1.json`. This will generate the preprocessed data file at `data/squad/data-fusion.pth`.
 ```sh
 mkdir -p data/squad
 python prepro.py --train PATH_TO_SQAUD_TRAIN --dev PATH_TO_SQUAD_DEV
