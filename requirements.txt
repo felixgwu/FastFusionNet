@@ -1,0 +1,6 @@
+spacy==1.9.0
+torch==0.3.1
+numpy
+pandas
+tqdm
+tensorboardX
