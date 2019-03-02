@@ -41,7 +41,7 @@ class DocReaderModel(object):
         # Building network.
         if opt['model_type'] == 'drqa':
             self.network = RnnDocReader(opt, embedding=embedding)
-        elif opt['model_type'] == 'drqa-gldr':
+        elif opt['model_type'] == 'gldr-drqa':
             self.network = CnnDocReader(opt, embedding=embedding)
         elif opt['model_type'] == 'fusionnet':
             self.network = FusionNet(opt, embedding=embedding)

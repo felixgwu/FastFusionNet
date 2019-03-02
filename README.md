@@ -28,7 +28,7 @@ python prepro.py --train PATH_TO_SQAUD_TRAIN --dev PATH_TO_SQUAD_DEV
 ```
 
 ## Training
-To train FastFusionNet:
+To train FastFusionNet [(Wu et al., arXiv 2019)](https://arxiv.org/abs/1902.11291v1):
 ```sh
 SAVE='save/fastfusionnet'
 mkdir -p $SAVE
@@ -38,7 +38,7 @@ python train.py --model_type fusionnet --hidden_size 125 --end_gru \
     --rnn_type sru --fusion_reading_layers 2 --fusion_understanding_layers 2 --fusion_final_layers 2
 ```
 
-To train FusionNet:
+To train FusionNet [(Huang et al., ICLR 2018)](https://arxiv.org/abs/1711.07341):
 ```sh
 SAVE='save/fusionnet'
 mkdir -p $SAVE
@@ -46,6 +46,14 @@ python train.py --model_type fusionnet --hidden_size 125 --end_gru \
     --dropout_rnn 0.2 --data_suffix fusion --save_dir $SAVE \
     -lr 0.001 -gc 20  -e 100 --batch_size 32 \
     --rnn_type lstm --fusion_reading_layers 1 --fusion_understanding_layers 1 --fusion_final_layers 1 --use_cove
+```
+
+To train GLDR-DrQA [(Wu et al., arXiv 2017)](https://arxiv.org/abs/1711.04352):
+```sh
+python train.py --model_type gldr-drqa --hidden_size 125 --end_gru \
+    --dropout_rnn 0.2 --data_suffix fusion --save_dir $SAVE \
+    -lr 0.001 -gc 20  -e 100 --batch_size 32 \
+    -doc_layers 17 --question_layers 9
 ```
 
 ## Pre-trained models (coming soon)
