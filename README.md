@@ -45,8 +45,10 @@ mkdir -p $SAVE
 python train.py --model_type fusionnet --hidden_size 125 --end_gru \
     --dropout_rnn 0.2 --data_suffix fusion --save_dir $SAVE \
     -lr 0.001 -gc 20  -e 100 --batch_size 32 \
-    --rnn_type lstm --fusion_reading_layers 1 --fusion_understanding_layers 1 --fusion_final_layers 1 --use_CoVe
+    --rnn_type lstm --fusion_reading_layers 1 --fusion_understanding_layers 1 --fusion_final_layers 1 --use_cove
 ```
+
+## Pre-trained models (coming soon)
 
 ## Reference
 ```
