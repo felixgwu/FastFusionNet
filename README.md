@@ -1,7 +1,7 @@
 # FastFusionNet
 
 ## Overview
-This repo contains the code of [_FastFusionNet: New State-of-the-Art for DAWNBench SQuAD_](https://arxiv.org/abs/1902.11291v1).
+This repo contains the code of [_FastFusionNet: New State-of-the-Art for DAWNBench SQuAD_](https://arxiv.org/abs/1902.11291).
 
 ## Requirements
 ```
