@@ -75,4 +75,4 @@ python eval.py --save_dir save/fastfusionnet --resume best_model.pt --eval_batch
 ```
 ## Acknowledgement
 This is based on the v0.3.1 version of Runqi Yang's excellent [DrQA code base](https://github.com/hitvoice/DrQA/tree/4ad445276373173d7f5845352a4fff910bf1239e) as well as the official [FusionNet on NLI](https://github.com/momohuang/FusionNet-NLI) implementation.
-Lots of Runqi's code is borrowed from [Facebook/ParlAI](https://github.com/facebookresearch/ParlAI/) under a MIT license.
+Lots of Runqi's code is borrowed from [Facebook/ParlAI](https://github.com/facebookresearch/ParlAI/) under an MIT license.
