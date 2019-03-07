@@ -250,8 +250,6 @@ class RnnDocReader(RCModelProto):
             concat_layers=opt['concat_rnn_layers'],
             rnn_type=opt['rnn_type'],
             padding=opt['rnn_padding'],
-            sd_min_size=opt['sd_min_size'],
-            sd_rescale=opt['sd_rescale'],
         )
 
         # RNN question encoder
@@ -265,8 +263,6 @@ class RnnDocReader(RCModelProto):
             concat_layers=opt['concat_rnn_layers'],
             rnn_type=opt['rnn_type'],
             padding=opt['rnn_padding'],
-            sd_min_size=opt['sd_min_size'],
-            sd_rescale=opt['sd_rescale'],
         )
 
         # Output sizes of rnn encoders

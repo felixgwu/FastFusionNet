@@ -56,6 +56,12 @@ python train.py --model_type gldr-drqa --hidden_size 125 --end_gru \
     -doc_layers 17 --question_layers 9
 ```
 
+## Evalutation
+To evaluate the best trained model in 'save/fastfusionnet' and get the latency (batch size=1):
+```sh
+python eval.py --save_dir save/fastfusionnet --resume best_model.pt --eval_batch_size 1
+```
+
 ## Pre-trained models (coming soon)
 
 ## Reference
@@ -68,3 +74,6 @@ python train.py --model_type gldr-drqa --hidden_size 125 --end_gru \
   year={2019}
 }
 ```
+## Acknowledgement
+This is based on the v0.3.1 version of Runqi Yang's excellent [DrQA code base](https://github.com/hitvoice/DrQA/tree/4ad445276373173d7f5845352a4fff910bf1239e) as well as the official [FusionNet on NLI](https://github.com/momohuang/FusionNet-NLI) implementation.
+Lots of Runqi's code is borrowed from [Facebook/ParlAI](https://github.com/facebookresearch/ParlAI/) under a BSD-3 license.
