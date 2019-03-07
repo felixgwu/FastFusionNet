@@ -3,7 +3,6 @@
 ## Overview
 This repo contains the code of [_FastFusionNet: New State-of-the-Art for DAWNBench SQuAD_](https://arxiv.org/abs/1902.11291v1).
 
-
 ## Requirements
 ```
 torch==0.3.1
@@ -43,14 +42,14 @@ To train FusionNet [(Huang et al., ICLR 2018)](https://arxiv.org/abs/1711.07341)
 SAVE='save/fusionnet'
 mkdir -p $SAVE
 python train.py --model_type fusionnet --hidden_size 125 --end_gru \
-    --dropout_rnn 0.2 --data_suffix fusion --save_dir $SAVE \
+    --dropout_rnn 0.4 --data_suffix fusion --save_dir $SAVE \
     -lr 0.001 -gc 20  -e 100 --batch_size 32 \
     --rnn_type lstm --fusion_reading_layers 1 --fusion_understanding_layers 1 --fusion_final_layers 1 --use_cove
 ```
 
 To train GLDR-DrQA [(Wu et al., arXiv 2017)](https://arxiv.org/abs/1711.04352):
 ```sh
-python train.py --model_type gldr-drqa --hidden_size 125 --end_gru \
+python train.py --model_type gldr-drqa --hidden_size 128 \
     --dropout_rnn 0.2 --data_suffix fusion --save_dir $SAVE \
     -lr 0.001 -gc 20  -e 100 --batch_size 32 \
     -doc_layers 17 --question_layers 9
