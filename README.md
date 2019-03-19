@@ -12,7 +12,7 @@ pandas
 tqdm
 tesnorboardX
 ```
-Please also install the SRU version 1 from [here](https://github.com/felixgwu/sru).
+Please also install the SRU version 1 from [here](https://github.com/felixgwu/oldsru/tree/dawnbench).
 Please download GloVe (Pennington et al., EMNLP 2014) and CoVe (McCann et al., NIPS 2017) by
 ```sh
 bash download.sh
