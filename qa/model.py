@@ -93,8 +93,8 @@ class DocReaderModel(object):
         # Transfer to GPU
         with torch.no_grad():
             if self.opt['cuda']:
-                inputs = [e.cuda() if torch.is_tensor(e) else e for e in ex[:10]]
-                target_s, target_e = ex[10].cuda(), ex[11].cuda()
+                inputs = [e.cuda(non_blocking=True) if torch.is_tensor(e) else e for e in ex[:10]]
+                target_s, target_e = ex[10].cuda(non_blocking=True), ex[11].cuda(non_blocking=True)
             else:
                 inputs = ex[:10]
                 target_s, target_e = ex[10], ex[11]
@@ -141,7 +141,7 @@ class DocReaderModel(object):
         with torch.no_grad():
             # Transfer to GPU
             if next(self.network.parameters()).is_cuda:
-                inputs = [e.cuda() if torch.is_tensor(e) else e for e in ex[:10]]
+                inputs = [e.cuda(non_blocking=True) if torch.is_tensor(e) else e for e in ex[:10]]
             else:
                 inputs = ex[:10]
 
