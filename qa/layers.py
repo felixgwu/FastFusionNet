@@ -17,7 +17,11 @@ from torch.autograd import Variable
 
 from torch.autograd.function import InplaceFunction
 from sru import SRUCell
-from oldsru import SRUCell as OldSRUCell
+try:
+    from oldsru import SRUCell as OldSRUCell
+except:
+    OldSRUCell = None
+    print('WARNING: oldsru is not installed', file=sys.stderr)
 
 
 # ------------------------------------------------------------------------------

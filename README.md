@@ -5,14 +5,14 @@ This repo contains the code of [_FastFusionNet: New State-of-the-Art for DAWNBen
 
 ## Requirements
 ```
-torch==0.3.1
+torch>=0.4.1
 spacy==1.9.0
 numpy
 pandas
 tqdm
 tesnorboardX
 ```
-Please also install the SRU version 1 from [here](https://github.com/felixgwu/sru).
+Please also install the SRU version 1 (oldsru) from [here](https://github.com/felixgwu/oldsru).
 Please download GloVe (Pennington et al., EMNLP 2014) and CoVe (McCann et al., NIPS 2017) by
 ```sh
 bash download.sh
@@ -34,8 +34,9 @@ mkdir -p $SAVE
 python train.py --model_type fusionnet --hidden_size 125 --end_gru \
     --dropout_rnn 0.2 --data_suffix fusion --save_dir $SAVE \
     -lr 0.001 -gc 20  -e 100 --batch_size 32 \
-    --rnn_type sru --fusion_reading_layers 2 --fusion_understanding_layers 2 --fusion_final_layers 2
+    --rnn_type oldsru --fusion_reading_layers 2 --fusion_understanding_layers 2 --fusion_final_layers 2
 ```
+One can replace `--rnn_type sru`or `sru-v2` to use newer versions of SRU.
 
 To train FusionNet [(Huang et al., ICLR 2018)](https://arxiv.org/abs/1711.07341):
 ```sh
