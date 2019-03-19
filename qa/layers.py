@@ -16,13 +16,8 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from torch.autograd.function import InplaceFunction
-try:
-    from sru.cuda_functional_old import SRUCell
-except:
-    from sru import SRUCell
-    SRUCell, SRUCell_new, SRUCell_v2 = None, None, None
-    print('Warning: Fail to import sru', file=sys.stderr)
-
+from sru import SRUCell
+from oldsru import SRUCell as OldSRUCell
 
 
 # ------------------------------------------------------------------------------
@@ -152,11 +147,11 @@ class LayerNormChannelFirst(nn.Module):
 
 
 class StackedBRNN(nn.Module):
-    RNN_TYPES = {'lstm': nn.LSTM, 'gru': nn.GRU, 'rnn': nn.RNN, 'sru': SRUCell}
-    SRU_TYPES = {'sru', 'sru-v2'}
+    RNN_TYPES = {'lstm': nn.LSTM, 'gru': nn.GRU, 'rnn': nn.RNN, 'sru': SRUCell, 'sru-v2': SRUCell, 'oldsru': OldSRUCell}
+    SRU_TYPES = {'sru', 'sru-v2', 'oldsru'}
 
     def __init__(self, input_size, hidden_size, num_layers,
-                 dropout_rate=0, dropout_output=False, rnn_type=nn.LSTM,
+                 dropout_rate=0, dropout_output=False, rnn_type='lstm',
                  variational_dropout=True,
                  residual=False,
                  squeeze_excitation=0,
@@ -177,12 +172,19 @@ class StackedBRNN(nn.Module):
         self.rnn_type = rnn_type
         for i in range(num_layers):
             input_size = input_size if i == 0 else 2 * hidden_size
-            if rnn_type in self.SRU_TYPES:
+            if rnn_type == 'oldsru':
                 self.rnns.append(self.RNN_TYPES[rnn_type](input_size, hidden_size,
-                                                            dropout=dropout_rate,
-                                                            rnn_dropout=dropout_rate,
-                                                            use_tanh=1,
-                                                            bidirectional=True))
+                                                          dropout=dropout_rate,
+                                                          rnn_dropout=dropout_rate,
+                                                          use_tanh=True,
+                                                          bidirectional=True))
+            elif rnn_type in self.SRU_TYPES:
+                self.rnns.append(self.RNN_TYPES[rnn_type](input_size, hidden_size, v1=rnn_type == 'sru',
+                                                          dropout=dropout_rate,
+                                                          rnn_dropout=dropout_rate,
+                                                          rescale=False,
+                                                          use_tanh=True,
+                                                          bidirectional=True))
             else:
                 self.rnns.append(self.RNN_TYPES[rnn_type](input_size, hidden_size,
                                                           num_layers=1,
@@ -1347,7 +1349,6 @@ class MaskZero(InplaceFunction):
 
     @staticmethod
     def backward(ctx, grad_output):
-        print('go:', grad_output.sum())
         mask = ctx.saved_variables[0]
         if mask is not None:
             grad_output.masked_fill_(mask.expand_as(grad_output), 0)

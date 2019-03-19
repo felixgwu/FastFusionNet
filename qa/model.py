@@ -19,7 +19,6 @@ import torch.nn.functional as F
 import numpy as np
 import logging
 
-from torch.autograd import Variable
 from .utils import AverageMeter, EMA
 from .rnn_reader import *
 
@@ -92,21 +91,20 @@ class DocReaderModel(object):
         self.network.train()
 
         # Transfer to GPU
-        if self.opt['cuda']:
-            inputs = [Variable(e.cuda(async=True)) if torch.is_tensor(e) else e for e in ex[:10]]
-            target_s = Variable(ex[10].cuda(async=True))
-            target_e = Variable(ex[11].cuda(async=True))
-        else:
-            inputs = [Variable(e) if torch.is_tensor(e) else e for e in ex[:10]]
-            target_s = Variable(ex[10])
-            target_e = Variable(ex[11])
+        with torch.no_grad():
+            if self.opt['cuda']:
+                inputs = [e.cuda() if torch.is_tensor(e) else e for e in ex[:10]]
+                target_s, target_e = ex[10].cuda(), ex[11].cuda()
+            else:
+                inputs = ex[:10]
+                target_s, target_e = ex[10], ex[11]
 
         # Run forward
         score_s, score_e = self.network(*inputs)
 
         # Compute loss and accuracies
         loss = F.nll_loss(score_s, target_s) + F.nll_loss(score_e, target_e)
-        self.train_loss.update(loss.data[0], ex[0].size(0))
+        self.train_loss.update(loss.item(), ex[0].size(0))
 
         # warm_start
         if self.opt['warm_start'] and self.updates <= 1000:
@@ -120,8 +118,8 @@ class DocReaderModel(object):
 
         # Clip gradients
         if self.opt['grad_clipping'] > 0.:
-            torch.nn.utils.clip_grad_norm(self.network.parameters(),
-                                          self.opt['grad_clipping'])
+            torch.nn.utils.clip_grad_norm_(self.network.parameters(),
+                                           self.opt['grad_clipping'])
 
         # Update parameters
         self.optimizer.step()
@@ -140,36 +138,37 @@ class DocReaderModel(object):
         # Eval mode
         self.network.eval()
 
-        # Transfer to GPU
-        if next(self.network.parameters()).is_cuda:
-            inputs = [Variable(e.cuda(async=True), volatile=True) if torch.is_tensor(e) else e for e in ex[:10]]
-        else:
-            inputs = [Variable(e, volatile=True) if torch.is_tensor(e) else e for e in ex[:10]]
+        with torch.no_grad():
+            # Transfer to GPU
+            if next(self.network.parameters()).is_cuda:
+                inputs = [e.cuda() if torch.is_tensor(e) else e for e in ex[:10]]
+            else:
+                inputs = ex[:10]
 
-        # Run forward
-        score_s, score_e = self.network(*inputs)
-        if type(score_s) is list:
-            score_s, score_e = score_s[-1], score_e[-1]
+            # Run forward
+            score_s, score_e = self.network(*inputs)
+            if type(score_s) is list:
+                score_s, score_e = score_s[-1], score_e[-1]
 
 
-        # Transfer to CPU/normal tensors for numpy ops
-        score_s = score_s.data.cpu()
-        score_e = score_e.data.cpu()
+            # Transfer to CPU/normal tensors for numpy ops
+            score_s = score_s.data.cpu()
+            score_e = score_e.data.cpu()
 
-        # Get argmax text spans
-        text = ex[-2]
-        spans = ex[-1]
-        predictions = []
-        max_len = self.opt['max_len'] or score_s.size(1)
-        for i in range(score_s.size(0)):
-            scores = torch.ger(score_s[i], score_e[i])
-            scores.triu_().tril_(max_len - 1)
-            scores = scores.numpy()
-            s_idx, e_idx = np.unravel_index(np.argmax(scores), scores.shape)
-            s_offset, e_offset = spans[i][s_idx][0], spans[i][e_idx][1]
-            predictions.append(text[i][s_offset:e_offset])
+            # Get argmax text spans
+            text = ex[-2]
+            spans = ex[-1]
+            predictions = []
+            max_len = self.opt['max_len'] or score_s.size(1)
+            for i in range(score_s.size(0)):
+                scores = torch.ger(score_s[i], score_e[i])
+                scores.triu_().tril_(max_len - 1)
+                scores = scores.numpy()
+                s_idx, e_idx = np.unravel_index(np.argmax(scores), scores.shape)
+                s_offset, e_offset = spans[i][s_idx][0], spans[i][e_idx][1]
+                predictions.append(text[i][s_offset:e_offset])
 
-        return predictions
+            return predictions
 
     def reset_parameters(self):
         # Reset fixed embeddings to original value

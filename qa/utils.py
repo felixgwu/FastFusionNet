@@ -207,87 +207,87 @@ class BatchGen(object):
         for batch in self.data:
             batch_size = len(batch)
             batch = list(zip(*batch))
-            
 
-            context_len = max(len(x) for x in batch[1])
-            # print('context_len:', context_len)
-            context_id = torch.LongTensor(batch_size, context_len).fill_(0)
-            for i, doc in enumerate(batch[1]):
-                context_id[i, :len(doc)] = torch.LongTensor(doc)
+            with torch.no_grad():
+                context_len = max(len(x) for x in batch[1])
+                # print('context_len:', context_len)
+                context_id = torch.LongTensor(batch_size, context_len).fill_(0)
+                for i, doc in enumerate(batch[1]):
+                    context_id[i, :len(doc)] = torch.LongTensor(doc)
 
-            feature_len = len(batch[2][0][0])
+                feature_len = len(batch[2][0][0])
 
-            context_feature = torch.Tensor(batch_size, context_len, feature_len).fill_(0)
-            for i, doc in enumerate(batch[2]):
-                for j, feature in enumerate(doc):
-                    context_feature[i, j, :] = torch.Tensor(feature)
-            if not self.opt['tf']:
-                if self.opt['match']:
-                    context_feature = context_feature[:, :, :3]
+                context_feature = torch.Tensor(batch_size, context_len, feature_len).fill_(0)
+                for i, doc in enumerate(batch[2]):
+                    for j, feature in enumerate(doc):
+                        context_feature[i, j, :] = torch.Tensor(feature)
+                if not self.opt['tf']:
+                    if self.opt['match']:
+                        context_feature = context_feature[:, :, :3]
+                    else:
+                        context_feature = None
                 else:
-                    context_feature = None
-            else:
-                if not self.opt['match']:
-                    context_feature = context_feature[:, :, 3:]
+                    if not self.opt['match']:
+                        context_feature = context_feature[:, :, 3:]
 
-            if self.opt['use_feat_emb']:
-                context_tag = torch.LongTensor(batch_size, context_len).fill_(0)
-                for i, doc in enumerate(batch[3]):
-                    context_tag[i, :len(doc)] = torch.LongTensor(doc)
+                if self.opt['use_feat_emb']:
+                    context_tag = torch.LongTensor(batch_size, context_len).fill_(0)
+                    for i, doc in enumerate(batch[3]):
+                        context_tag[i, :len(doc)] = torch.LongTensor(doc)
 
-                context_ent = torch.LongTensor(batch_size, context_len).fill_(0)
-                for i, doc in enumerate(batch[4]):
-                    context_ent[i, :len(doc)] = torch.LongTensor(doc)
-            else:
-                # create one-hot vectors
-                context_tag = torch.Tensor(batch_size, context_len, self.opt['pos_size']).fill_(0)
-                for i, doc in enumerate(batch[3]):
-                    for j, tag in enumerate(doc):
-                        context_tag[i, j, tag] = 1
+                    context_ent = torch.LongTensor(batch_size, context_len).fill_(0)
+                    for i, doc in enumerate(batch[4]):
+                        context_ent[i, :len(doc)] = torch.LongTensor(doc)
+                else:
+                    # create one-hot vectors
+                    context_tag = torch.Tensor(batch_size, context_len, self.opt['pos_size']).fill_(0)
+                    for i, doc in enumerate(batch[3]):
+                        for j, tag in enumerate(doc):
+                            context_tag[i, j, tag] = 1
 
-                context_ent = torch.Tensor(batch_size, context_len, self.opt['ner_size']).fill_(0)
-                for i, doc in enumerate(batch[4]):
-                    for j, ent in enumerate(doc):
-                        context_ent[i, j, ent] = 1
+                    context_ent = torch.Tensor(batch_size, context_len, self.opt['ner_size']).fill_(0)
+                    for i, doc in enumerate(batch[4]):
+                        for j, ent in enumerate(doc):
+                            context_ent[i, j, ent] = 1
 
-            question_len = max(len(x) for x in batch[5])
-            question_id = torch.LongTensor(batch_size, question_len).fill_(0)
-            for i, doc in enumerate(batch[5]):
-                question_id[i, :len(doc)] = torch.LongTensor(doc)
+                question_len = max(len(x) for x in batch[5])
+                question_id = torch.LongTensor(batch_size, question_len).fill_(0)
+                for i, doc in enumerate(batch[5]):
+                    question_id[i, :len(doc)] = torch.LongTensor(doc)
 
-            context_mask = torch.eq(context_id, 0)
-            question_mask = torch.eq(question_id, 0)
-            text = list(batch[6])
-            span = list(batch[7])
-            context_sentence_lens = list(batch[8])
+                context_mask = torch.eq(context_id, 0)
+                question_mask = torch.eq(question_id, 0)
+                text = list(batch[6])
+                span = list(batch[7])
+                context_sentence_lens = list(batch[8])
 
-            if self.with_cids:
-                context_char_id = torch.LongTensor(batch_size, context_len, 50).fill_(260) # 260 is padding_char
-                for i,d in enumerate(batch[9]):
-                    context_char_id[i, :d.size(0)] = d
-                question_char_id = torch.LongTensor(batch_size, question_len, 50).fill_(260)
-                for i,d in enumerate(batch[10]):
-                    question_char_id[i, :d.size(0)] = d
-            else:
-                context_char_id, question_char_id = None, None
+                if self.with_cids:
+                    context_char_id = torch.LongTensor(batch_size, context_len, 50).fill_(260) # 260 is padding_char
+                    for i,d in enumerate(batch[9]):
+                        context_char_id[i, :d.size(0)] = d
+                    question_char_id = torch.LongTensor(batch_size, question_len, 50).fill_(260)
+                    for i,d in enumerate(batch[10]):
+                        question_char_id[i, :d.size(0)] = d
+                else:
+                    context_char_id, question_char_id = None, None
 
-            if not self.eval:
-                tmp = torch.LongTensor([ex[0] for ex in batch[-1]])
-                y_s = tmp[:, 0].contiguous()
-                y_e = tmp[:, 1].contiguous()
-            elif context_char_id is not None:
-                context_char_id.volatile = True
-                question_char_id.volatile = True
-            if self.gpu:
-                context_id = context_id.pin_memory()
-                context_feature = context_feature.pin_memory() if context_feature is not None else None
-                context_tag = context_tag.pin_memory()
-                context_ent = context_ent.pin_memory()
-                context_mask = context_mask.pin_memory()
-                question_id = question_id.pin_memory()
-                question_mask = question_mask.pin_memory()
-                context_char_id = context_char_id.cuda() if context_char_id is not None else None
-                question_char_id = question_char_id.cuda() if question_char_id is not None else None
+                if not self.eval:
+                    tmp = torch.LongTensor([ex[0] for ex in batch[-1]])
+                    y_s = tmp[:, 0].contiguous()
+                    y_e = tmp[:, 1].contiguous()
+                elif context_char_id is not None:
+                    context_char_id.volatile = True
+                    question_char_id.volatile = True
+                if self.gpu:
+                    context_id = context_id.pin_memory()
+                    context_feature = context_feature.pin_memory() if context_feature is not None else None
+                    context_tag = context_tag.pin_memory()
+                    context_ent = context_ent.pin_memory()
+                    context_mask = context_mask.pin_memory()
+                    question_id = question_id.pin_memory()
+                    question_mask = question_mask.pin_memory()
+                    context_char_id = context_char_id.cuda() if context_char_id is not None else None
+                    question_char_id = question_char_id.cuda() if question_char_id is not None else None
             if self.eval:
                 yield (context_id, context_feature, context_tag, context_ent, context_mask,
                        question_id, question_mask, context_sentence_lens, context_char_id, question_char_id, text, span)
