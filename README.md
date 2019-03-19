@@ -3,6 +3,9 @@
 ## Overview
 This repo contains the code of [_FastFusionNet: New State-of-the-Art for DAWNBench SQuAD_](https://arxiv.org/abs/1902.11291).
 
+## News
+We now support PyTorch version `>=0.4.1` in a new [branch](https://github.com/felixgwu/FastFusionNet/tree/v1.0.1). However, it is slightly slower.
+
 ## Requirements
 ```
 torch==0.3.1
