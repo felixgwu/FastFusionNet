@@ -16,13 +16,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from torch.autograd.function import InplaceFunction
-try:
-    from sru.cuda_functional_old import SRUCell
-except:
-    from sru import SRUCell
-    SRUCell, SRUCell_new, SRUCell_v2 = None, None, None
-    print('Warning: Fail to import sru', file=sys.stderr)
-
+from oldsru import SRUCell
 
 
 # ------------------------------------------------------------------------------

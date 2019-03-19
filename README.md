@@ -11,8 +11,9 @@ numpy
 pandas
 tqdm
 tesnorboardX
+oldsru
 ```
-Please also install the SRU version 1 from [here](https://github.com/felixgwu/oldsru/tree/dawnbench).
+Please also install the SRU version 1 (`oldsru`) from [here](https://github.com/felixgwu/oldsru).
 Please download GloVe (Pennington et al., EMNLP 2014) and CoVe (McCann et al., NIPS 2017) by
 ```sh
 bash download.sh
