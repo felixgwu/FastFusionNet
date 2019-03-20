@@ -62,7 +62,8 @@ To evaluate the best trained model in 'save/fastfusionnet' and get the latency (
 python eval.py --save_dir save/fastfusionnet --resume best_model.pt --eval_batch_size 1
 ```
 
-## Pre-trained models (coming soon)
+## Pre-trained model
+FastFusionNet model [link](https://cornell.box.com/s/7cunr95j9xcigo9wa05jvike8my7z3o5) dev EM: 73.58 F1: 82.42
 
 ## Reference
 ```
